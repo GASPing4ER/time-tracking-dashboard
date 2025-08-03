@@ -14,6 +14,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       sx={{
         display: "flex",
         width: "100vw",
+        height: "100vh",
       }}
     >
       <AppBar />
@@ -27,6 +28,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           mt: "60px",
           ml: { sm: "240px" },
           overflow: "auto",
+          position: "relative",
         }}
       >
         {children}
