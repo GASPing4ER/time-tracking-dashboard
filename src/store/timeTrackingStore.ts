@@ -1,7 +1,12 @@
 // src/store/timeTrackingStore.ts
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { TimeTrackingState, TimeEntry } from "../types";
+import type { TimeTrackingState } from "../types";
+import {
+  fetchProjects,
+  fetchTimeEntries,
+  saveTimeEntry,
+} from "../api/mockTimeTrackingApi";
 
 const useTimeTrackingStore = create<TimeTrackingState>()(
   persist(
@@ -12,6 +17,8 @@ const useTimeTrackingStore = create<TimeTrackingState>()(
         { id: 2, name: "Mobile App", color: "#4ECDC4" },
         { id: 3, name: "Marketing Campaign", color: "#45B7D1" },
       ],
+      loading: false,
+      error: null,
       tags: ["Meeting", "Development", "Design", "Research", "Break"],
       activeTimer: null,
       filters: {
@@ -22,13 +29,32 @@ const useTimeTrackingStore = create<TimeTrackingState>()(
       darkMode: false,
       mobileOpen: false,
 
-      addTimeEntry: (entry: Omit<TimeEntry, "id" | "date">) => {
-        const newEntry = {
-          ...entry,
-          id: Date.now(),
-          date: new Date(entry.startTime).toISOString().split("T")[0], // Format as YYYY-MM-DD
-        };
-        set((state) => ({ timeEntries: [newEntry, ...state.timeEntries] }));
+      loadInitialData: async () => {
+        set({ loading: true });
+        try {
+          const [entries, projects] = await Promise.all([
+            fetchTimeEntries(),
+            fetchProjects(),
+          ]);
+          set({ timeEntries: entries, projects, loading: false });
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        } catch (error) {
+          set({ error: "Failed to load data", loading: false });
+        }
+      },
+
+      addTimeEntry: async (entry) => {
+        set({ loading: true });
+        try {
+          const newEntry = await saveTimeEntry(entry);
+          set((state) => ({
+            timeEntries: [newEntry, ...state.timeEntries],
+            loading: false,
+          }));
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        } catch (error) {
+          set({ error: "Failed to save entry", loading: false });
+        }
       },
 
       startTimer: (projectId, taskName, tag) => {

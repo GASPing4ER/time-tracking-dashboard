@@ -24,6 +24,8 @@ export interface Filters {
 export interface TimeTrackingState {
   timeEntries: TimeEntry[];
   projects: Project[];
+  loading: boolean;
+  error: string | null;
   tags: string[];
   activeTimer: {
     projectId: number;
@@ -34,7 +36,8 @@ export interface TimeTrackingState {
   filters: Filters;
   darkMode: boolean;
   mobileOpen: boolean;
-  addTimeEntry: (entry: Omit<TimeEntry, "id" | "date">) => void;
+  loadInitialData: () => Promise<void>;
+  addTimeEntry: (entry: Omit<TimeEntry, "id" | "date">) => Promise<void>;
   startTimer: (projectId: number, taskName: string, tag: string) => void;
   stopTimer: () => void;
   deleteTimeEntry: (id: number) => void;

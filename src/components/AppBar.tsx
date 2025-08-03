@@ -38,7 +38,7 @@ const AppBar: React.FC = () => {
         <IconButton color="inherit" onClick={toggleDarkMode}>
           {darkMode ? "☀️" : "🌙"}
         </IconButton>
-        <Avatar sx={{ ml: 2 }}>U</Avatar>
+        <Avatar sx={{ ml: 2 }}>G</Avatar>
       </Toolbar>
     </MuiAppBar>
   );
