@@ -1,6 +1,6 @@
 // src/components/TagSummary.tsx
 import React from "react";
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, useTheme } from "@mui/material";
 import {
   BarChart,
   Bar,
@@ -14,8 +14,39 @@ import {
 import { differenceInMinutes, parseISO } from "date-fns";
 import useTimeTrackingStore from "../store/timeTrackingStore";
 
+interface CustomTickProps {
+  x: number;
+  y: number;
+  payload: {
+    value: string;
+    offset: number;
+    index: number;
+  };
+}
+
 const TagSummary: React.FC = () => {
   const { timeEntries, tags } = useTimeTrackingStore();
+  const theme = useTheme();
+
+  // Custom tick component for vertical labels
+  const CustomizedAxisTick = (props: CustomTickProps) => {
+    const { x, y, payload } = props;
+    return (
+      <g transform={`translate(${x},${y})`}>
+        <text
+          x={0}
+          y={0}
+          dy={16}
+          textAnchor="end"
+          fill={theme.palette.text.secondary}
+          transform="rotate(-45)"
+          fontSize={12}
+        >
+          {payload.value}
+        </text>
+      </g>
+    );
+  };
 
   const tagData = tags
     .map((tag) => {
@@ -45,13 +76,31 @@ const TagSummary: React.FC = () => {
       </Typography>
 
       <Box sx={{ height: 300 }}>
+        {" "}
+        {/* Increased height for rotated labels */}
         {tagData.length > 0 ? (
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={tagData}>
+            <BarChart
+              data={tagData}
+              margin={{
+                bottom: 20,
+                top: 20,
+                right: 20,
+                left: -20,
+              }}
+            >
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
+              <XAxis
+                dataKey="name"
+                tick={(props) => <CustomizedAxisTick {...props} />}
+                interval={0}
+                height={70}
+              />
               <YAxis />
-              <Tooltip formatter={(value) => [`${value} hours`, "Duration"]} />
+              <Tooltip
+                formatter={(value) => [`${value} hours`, "Duration"]}
+                labelFormatter={(label) => `Tag: ${label}`}
+              />
               <Legend />
               <Bar
                 dataKey="hours"

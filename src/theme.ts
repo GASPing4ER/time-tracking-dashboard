@@ -27,6 +27,8 @@ export const getTheme = (darkMode: boolean) =>
         styleOverrides: {
           root: {
             textTransform: "none",
+            borderRadius: "8px",
+            padding: "8px 16px",
           },
         },
       },

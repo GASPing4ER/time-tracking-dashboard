@@ -261,17 +261,19 @@ const TimeTracker: React.FC = () => {
           <DialogTitle>Add Manual Time Entry</DialogTitle>
           <DialogContent>
             <Grid container spacing={2} sx={{ mt: 1 }}>
-              <Grid size={{ xs: 6 }}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <TimePicker
                   label="Start Time"
                   value={manualStart}
+                  sx={{ width: "100%" }}
                   onChange={(newValue) => setManualStart(newValue)}
                 />
               </Grid>
-              <Grid size={{ xs: 6 }}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <TimePicker
                   label="End Time"
                   value={manualEnd}
+                  sx={{ width: "100%" }}
                   onChange={(newValue) => setManualEnd(newValue)}
                 />
               </Grid>

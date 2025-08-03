@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, useTheme } from "@mui/material";
 import {
   BarChart,
   Bar,
@@ -20,14 +20,42 @@ import {
 } from "date-fns";
 import useTimeTrackingStore from "../store/timeTrackingStore";
 
+interface CustomTickProps {
+  x: number;
+  y: number;
+  payload: {
+    value: string;
+    offset: number;
+    index: number;
+  };
+}
+
 const WeeklySummary: React.FC = () => {
   const { timeEntries, projects } = useTimeTrackingStore();
+  const theme = useTheme();
 
   // Get current week (Monday to Sunday)
   const today = new Date();
   const weekStart = startOfWeek(today, { weekStartsOn: 1 }); // Monday
   const weekEnd = endOfWeek(today, { weekStartsOn: 1 }); // Sunday
   const weekDays = eachDayOfInterval({ start: weekStart, end: weekEnd });
+
+  // Custom XAxis tick component for vertical labels
+  const CustomizedAxisTick = ({ x, y, payload }: CustomTickProps) => (
+    <g transform={`translate(${x},${y})`}>
+      <text
+        x={0}
+        y={0}
+        dy={16}
+        textAnchor="end"
+        fill={theme.palette.text.secondary}
+        transform="rotate(-45)"
+        fontSize={12}
+      >
+        {payload.value}
+      </text>
+    </g>
+  );
 
   // Prepare data for stacked bar chart
   const data = weekDays.map((day) => {
@@ -36,7 +64,6 @@ const WeeklySummary: React.FC = () => {
       (entry) => format(parseISO(entry.startTime), "yyyy-MM-dd") === dayStr
     );
 
-    // Calculate time per project for this day
     const projectData: Record<string, number> = {};
 
     projects.forEach((project) => {
@@ -76,7 +103,7 @@ const WeeklySummary: React.FC = () => {
         name={project.name}
         stackId="a"
         fill={project.color}
-        radius={project.id === projects[0].id ? [4, 4, 0, 0] : 0} // Only round corners for first project
+        radius={project.id === projects[0].id ? [4, 4, 0, 0] : 0}
       />
     ));
   };
@@ -89,10 +116,25 @@ const WeeklySummary: React.FC = () => {
       </Typography>
 
       <Box sx={{ height: 300 }}>
+        {" "}
+        {/* Increased height to accommodate rotated labels */}
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={data}>
+          <BarChart
+            data={data}
+            margin={{
+              bottom: 20, // Extra margin for rotated labels
+              top: 20,
+              right: 20,
+              left: -20,
+            }}
+          >
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" />
+            <XAxis
+              dataKey="name"
+              tick={(props) => <CustomizedAxisTick {...props} />}
+              interval={0} // Ensure all labels are shown
+              height={70} // Increased height for rotated labels
+            />
             <YAxis />
             <Tooltip
               formatter={(value, name) => {
