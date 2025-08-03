@@ -115,7 +115,7 @@ const WeeklySummary: React.FC = () => {
         {format(weekEnd, "MMM d")}
       </Typography>
 
-      <Box sx={{ height: 300 }}>
+      <Box sx={{ height: 350 }}>
         {" "}
         {/* Increased height to accommodate rotated labels */}
         <ResponsiveContainer width="100%" height="100%">
