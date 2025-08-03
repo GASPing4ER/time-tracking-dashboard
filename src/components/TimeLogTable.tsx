@@ -14,16 +14,23 @@ import {
   Box,
   TableFooter,
   TablePagination,
+  CircularProgress,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import useTimeTrackingStore from "../store/timeTrackingStore";
-import { format, parseISO, differenceInSeconds } from "date-fns";
+import {
+  format,
+  parseISO,
+  differenceInSeconds,
+  startOfWeek,
+  isAfter,
+} from "date-fns";
 
 const TimeLogTable: React.FC = () => {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
-  const { timeEntries, projects, filters, deleteTimeEntry } =
+  const { timeEntries, projects, filters, deleteTimeEntry, loading } =
     useTimeTrackingStore();
 
   const filteredEntries = timeEntries.filter((entry) => {
@@ -46,8 +53,8 @@ const TimeLogTable: React.FC = () => {
     }
 
     if (filters.timeRange === "week") {
-      const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay()));
-      return entryDate >= startOfWeek;
+      const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 }); // Monday
+      return isAfter(entryDate, weekStart);
     }
 
     if (filters.timeRange === "month") {
@@ -59,11 +66,6 @@ const TimeLogTable: React.FC = () => {
 
     return true;
   });
-
-  // const emptyRows =
-  //   page > 0
-  //     ? Math.max(0, (1 + page) * rowsPerPage - filteredEntries.length)
-  //     : 0;
 
   const handleChangePage = (
     _event: React.MouseEvent<HTMLButtonElement> | null,
@@ -111,12 +113,14 @@ const TimeLogTable: React.FC = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredEntries.length === 0 || rowsPerPage === 0 ? (
-              <TableRow>
-                <TableCell colSpan={7} align="center">
-                  No time entries found
-                </TableCell>
-              </TableRow>
+            {loading ? (
+              <Box sx={{ display: "flex", justifyContent: "center", p: 4 }}>
+                <CircularProgress />
+              </Box>
+            ) : filteredEntries.length === 0 ? (
+              <TableCell colSpan={7} align="center">
+                No time entries found
+              </TableCell>
             ) : (
               filteredEntries
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)

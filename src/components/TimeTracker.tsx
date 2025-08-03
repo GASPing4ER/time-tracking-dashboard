@@ -81,9 +81,9 @@ const TimeTracker: React.FC = () => {
       .padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
   };
 
-  const handleManualSubmit = () => {
+  const handleManualSubmit = async () => {
     if (manualStart && manualEnd && taskName.trim()) {
-      addTimeEntry({
+      await addTimeEntry({
         projectId,
         taskName,
         tag,
@@ -92,6 +92,8 @@ const TimeTracker: React.FC = () => {
       });
       setOpenManualDialog(false);
       setTaskName("");
+      setManualStart(dayjs());
+      setManualEnd(dayjs());
     }
   };
 

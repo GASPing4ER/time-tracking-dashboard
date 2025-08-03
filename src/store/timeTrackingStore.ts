@@ -51,9 +51,9 @@ const useTimeTrackingStore = create<TimeTrackingState>()(
             timeEntries: [newEntry, ...state.timeEntries],
             loading: false,
           }));
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (error) {
           set({ error: "Failed to save entry", loading: false });
+          throw error;
         }
       },
 
