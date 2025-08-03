@@ -1,4 +1,3 @@
-// src/components/WeeklySummary.tsx
 import React from "react";
 import { Box, Typography } from "@mui/material";
 import {
@@ -13,7 +12,8 @@ import {
 } from "recharts";
 import {
   format,
-  subDays,
+  startOfWeek,
+  endOfWeek,
   parseISO,
   eachDayOfInterval,
   differenceInMinutes,
@@ -21,50 +21,17 @@ import {
 import useTimeTrackingStore from "../store/timeTrackingStore";
 
 const WeeklySummary: React.FC = () => {
-  const { timeEntries, filters } = useTimeTrackingStore();
+  const { timeEntries } = useTimeTrackingStore();
 
-  const filteredEntries = timeEntries.filter((entry) => {
-    // Filter by project
-    if (filters.project && entry.projectId !== filters.project) return false;
-
-    // Filter by tag
-    if (filters.tag && entry.tag !== filters.tag) return false;
-
-    // Filter by time range
-    const entryDate = parseISO(entry.startTime);
-    const now = new Date();
-
-    if (filters.timeRange === "today") {
-      return (
-        entryDate.getDate() === now.getDate() &&
-        entryDate.getMonth() === now.getMonth() &&
-        entryDate.getFullYear() === now.getFullYear()
-      );
-    }
-
-    if (filters.timeRange === "week") {
-      const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay()));
-      return entryDate >= startOfWeek;
-    }
-
-    if (filters.timeRange === "month") {
-      return (
-        entryDate.getMonth() === now.getMonth() &&
-        entryDate.getFullYear() === now.getFullYear()
-      );
-    }
-
-    return true;
-  });
-
-  // Generate data for the last 7 days
+  // Get current week (Monday to Sunday)
   const today = new Date();
-  const lastWeek = subDays(today, 6);
-  const days = eachDayOfInterval({ start: lastWeek, end: today });
+  const weekStart = startOfWeek(today, { weekStartsOn: 1 }); // Monday
+  const weekEnd = endOfWeek(today, { weekStartsOn: 1 }); // Sunday
+  const weekDays = eachDayOfInterval({ start: weekStart, end: weekEnd });
 
-  const data = days.map((day) => {
+  const data = weekDays.map((day) => {
     const dayStr = format(day, "yyyy-MM-dd");
-    const dayEntries = filteredEntries.filter(
+    const dayEntries = timeEntries.filter(
       (entry) => format(parseISO(entry.startTime), "yyyy-MM-dd") === dayStr
     );
 
@@ -78,8 +45,9 @@ const WeeklySummary: React.FC = () => {
     const totalHours = (totalMinutes / 60).toFixed(1);
 
     return {
-      name: format(day, "EEE"),
-      date: format(day, "MMM d"),
+      name: format(day, "EEE"), // Day abbreviation (Mon, Tue, etc.)
+      date: format(day, "MMM d"), // Date (Aug 1, Aug 2, etc.)
+      fullDate: format(day, "yyyy-MM-dd"), // For reference
       hours: parseFloat(totalHours),
     };
   });
@@ -87,7 +55,8 @@ const WeeklySummary: React.FC = () => {
   return (
     <Box>
       <Typography variant="h6" gutterBottom>
-        Weekly Summary (Hours)
+        Weekly Summary (Hours) - {format(weekStart, "MMM d")} to{" "}
+        {format(weekEnd, "MMM d")}
       </Typography>
 
       <Box sx={{ height: 300 }}>
@@ -98,9 +67,12 @@ const WeeklySummary: React.FC = () => {
             <YAxis />
             <Tooltip
               formatter={(value) => [`${value} hours`, "Duration"]}
-              labelFormatter={(label) =>
-                data.find((d) => d.name === label)?.date || label
-              }
+              labelFormatter={(label) => {
+                const dayData = data.find((d) => d.name === label);
+                return dayData
+                  ? format(new Date(dayData.fullDate), "EEEE, MMM d")
+                  : label;
+              }}
             />
             <Legend />
             <Bar
