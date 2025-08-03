@@ -9,10 +9,9 @@ import {
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import useTimeTrackingStore from "../store/timeTrackingStore";
+import ThemeSwitcher from "./ThemeSwitcher";
 
 const AppBar: React.FC = () => {
-  const darkMode = useTimeTrackingStore((state) => state.darkMode);
-  const toggleDarkMode = useTimeTrackingStore((state) => state.toggleDarkMode);
   const toggleMobileOpen = useTimeTrackingStore(
     (state) => state.toggleMobileOpen
   );
@@ -35,9 +34,9 @@ const AppBar: React.FC = () => {
         <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
           Time Tracker
         </Typography>
-        <IconButton color="inherit" onClick={toggleDarkMode}>
-          {darkMode ? "☀️" : "🌙"}
-        </IconButton>
+
+        <ThemeSwitcher />
+
         <Avatar sx={{ ml: 2 }}>G</Avatar>
       </Toolbar>
     </MuiAppBar>

@@ -1,6 +1,6 @@
 // src/components/ProjectSummary.tsx
 import React from "react";
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, useMediaQuery, useTheme } from "@mui/material";
 import {
   PieChart,
   Pie,
@@ -14,6 +14,8 @@ import useTimeTrackingStore from "../store/timeTrackingStore";
 
 const ProjectSummary: React.FC = () => {
   const { timeEntries, projects } = useTimeTrackingStore();
+  const theme = useTheme();
+  const isMediumScreenUp = useMediaQuery(theme.breakpoints.up("lg"));
 
   const projectData = projects
     .map((project) => {
@@ -68,7 +70,7 @@ const ProjectSummary: React.FC = () => {
                 fill="#8884d8"
                 dataKey="value"
                 nameKey="name"
-                label={renderCustomizedLabel}
+                label={isMediumScreenUp ? renderCustomizedLabel : undefined}
               >
                 {projectData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />

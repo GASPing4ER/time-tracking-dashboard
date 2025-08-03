@@ -36,8 +36,8 @@ const WeeklySummary: React.FC = () => {
 
   // Get current week (Monday to Sunday)
   const today = new Date();
-  const weekStart = startOfWeek(today, { weekStartsOn: 1 }); // Monday
-  const weekEnd = endOfWeek(today, { weekStartsOn: 1 }); // Sunday
+  const weekStart = startOfWeek(today, { weekStartsOn: 1 });
+  const weekEnd = endOfWeek(today, { weekStartsOn: 1 });
   const weekDays = eachDayOfInterval({ start: weekStart, end: weekEnd });
 
   // Custom XAxis tick component for vertical labels
@@ -87,9 +87,9 @@ const WeeklySummary: React.FC = () => {
     });
 
     return {
-      name: format(day, "EEE"), // Day abbreviation (Mon, Tue, etc.)
-      date: format(day, "MMM d"), // Date (Aug 1, Aug 2, etc.)
-      fullDate: format(day, "yyyy-MM-dd"), // For reference
+      name: format(day, "EEE"),
+      date: format(day, "MMM d"),
+      fullDate: format(day, "yyyy-MM-dd"),
       ...projectData,
     };
   });
@@ -117,12 +117,11 @@ const WeeklySummary: React.FC = () => {
 
       <Box sx={{ height: 350 }}>
         {" "}
-        {/* Increased height to accommodate rotated labels */}
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
             data={data}
             margin={{
-              bottom: 20, // Extra margin for rotated labels
+              bottom: 20,
               top: 20,
               right: 20,
               left: -20,
@@ -132,8 +131,7 @@ const WeeklySummary: React.FC = () => {
             <XAxis
               dataKey="name"
               tick={(props) => <CustomizedAxisTick {...props} />}
-              interval={0} // Ensure all labels are shown
-              height={70} // Increased height for rotated labels
+              height={70}
             />
             <YAxis />
             <Tooltip
