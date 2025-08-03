@@ -15,20 +15,20 @@ const Dashboard: React.FC = () => {
         </Typography>
       </Grid>
 
-      <Grid size={{ xs: 12, md: 4 }}>
+      <Grid size={{ xs: 12, lg: 4 }}>
         <Paper sx={{ p: 2 }}>
           <TimeTracker />
         </Paper>
       </Grid>
 
-      <Grid size={{ xs: 12, md: 8 }}>
+      <Grid size={{ xs: 12, lg: 8 }}>
         <Paper sx={{ p: 2 }}>
           <FilterPanel />
         </Paper>
       </Grid>
 
       <Grid size={{ xs: 12 }}>
-        <Paper sx={{ p: 2 }}>
+        <Paper sx={{ p: 2, overflowX: "auto" }}>
           <TimeLogTable />
         </Paper>
       </Grid>

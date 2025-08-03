@@ -21,7 +21,7 @@ const FilterPanel: React.FC = () => {
         Filter Time Entries
       </Typography>
 
-      <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
+      <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
         <FormControl fullWidth>
           <InputLabel id="filter-project">Project</InputLabel>
           <Select

@@ -10,7 +10,12 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
-    <Box sx={{ display: "flex" }}>
+    <Box
+      sx={{
+        display: "flex",
+        width: "100vw",
+      }}
+    >
       <AppBar />
       <Drawer />
       <Box
@@ -21,6 +26,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           width: { sm: `calc(100% - 240px)` },
           mt: "60px",
           ml: { sm: "240px" },
+          overflow: "auto",
         }}
       >
         {children}

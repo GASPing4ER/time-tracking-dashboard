@@ -12,12 +12,17 @@ import {
   IconButton,
   Chip,
   Box,
+  TableFooter,
+  TablePagination,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import useTimeTrackingStore from "../store/timeTrackingStore";
 import { format, parseISO, differenceInSeconds } from "date-fns";
 
 const TimeLogTable: React.FC = () => {
+  const [page, setPage] = React.useState(0);
+  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+
   const { timeEntries, projects, filters, deleteTimeEntry } =
     useTimeTrackingStore();
 
@@ -55,6 +60,25 @@ const TimeLogTable: React.FC = () => {
     return true;
   });
 
+  // const emptyRows =
+  //   page > 0
+  //     ? Math.max(0, (1 + page) * rowsPerPage - filteredEntries.length)
+  //     : 0;
+
+  const handleChangePage = (
+    _event: React.MouseEvent<HTMLButtonElement> | null,
+    newPage: number
+  ) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
   const getProjectById = (id: number) => {
     return projects.find((project) => project.id === id);
   };
@@ -87,46 +111,66 @@ const TimeLogTable: React.FC = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredEntries.length === 0 ? (
+            {filteredEntries.length === 0 || rowsPerPage === 0 ? (
               <TableRow>
                 <TableCell colSpan={7} align="center">
                   No time entries found
                 </TableCell>
               </TableRow>
             ) : (
-              filteredEntries.map((entry) => {
-                const project = getProjectById(entry.projectId);
-                return (
-                  <TableRow key={entry.id}>
-                    <TableCell>
-                      <Chip
-                        label={project?.name || "Unknown"}
-                        sx={{ backgroundColor: project?.color || "#ccc" }}
-                      />
-                    </TableCell>
-                    <TableCell>{entry.taskName}</TableCell>
-                    <TableCell>
-                      {format(parseISO(entry.startTime), "PPpp")}
-                    </TableCell>
-                    <TableCell>
-                      {format(parseISO(entry.endTime), "PPpp")}
-                    </TableCell>
-                    <TableCell>
-                      {formatDuration(entry.startTime, entry.endTime)}
-                    </TableCell>
-                    <TableCell>
-                      <Chip label={entry.tag} variant="outlined" />
-                    </TableCell>
-                    <TableCell>
-                      <IconButton onClick={() => deleteTimeEntry(entry.id)}>
-                        <DeleteIcon />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                );
-              })
+              filteredEntries
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .map((entry) => {
+                  const project = getProjectById(entry.projectId);
+                  return (
+                    <TableRow key={entry.id}>
+                      <TableCell>
+                        <Chip
+                          label={project?.name || "Unknown"}
+                          sx={{ backgroundColor: project?.color || "#ccc" }}
+                        />
+                      </TableCell>
+                      <TableCell>{entry.taskName}</TableCell>
+                      <TableCell>
+                        {format(parseISO(entry.startTime), "PPpp")}
+                      </TableCell>
+                      <TableCell>
+                        {format(parseISO(entry.endTime), "PPpp")}
+                      </TableCell>
+                      <TableCell>
+                        {formatDuration(entry.startTime, entry.endTime)}
+                      </TableCell>
+                      <TableCell>
+                        <Chip label={entry.tag} variant="outlined" />
+                      </TableCell>
+                      <TableCell>
+                        <IconButton onClick={() => deleteTimeEntry(entry.id)}>
+                          <DeleteIcon />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
             )}
           </TableBody>
+          <TableFooter>
+            <TableRow>
+              <TablePagination
+                rowsPerPageOptions={[5, 10, 25, { label: "All", value: -1 }]}
+                colSpan={3}
+                count={filteredEntries.length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                slotProps={{
+                  select: {
+                    "aria-label": "rows per page",
+                  },
+                }}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+              />
+            </TableRow>
+          </TableFooter>
         </Table>
       </TableContainer>
     </Box>
